@@ -213,3 +213,6 @@ if __name__ == "__main__":
         print("X:", X[i])
         print("y:", y[i])
         print("-" * 50)
+    # save the cleaned data to a new CSV 
+    df_out = pd.DataFrame({"headline": X, "label": y})
+    df_out.to_csv("scraped_headlines.csv", index=False)
