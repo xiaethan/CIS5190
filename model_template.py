@@ -29,10 +29,10 @@ class Model(nn.Module):
         # Initialize your model here
         self.vectorizer = TfidfVectorizer(
             stop_words='english',    # ignores "the", "a", "is" etc
-            max_features=5000,       # only keeps the 5000 most useful words
-            ngram_range=(1, 2),      # considers single words AND pairs like "illegal aliens"
+            max_features=10000,       # only keeps the 10000 most useful words
+            ngram_range=(1, 3),      # considers single words AND pairs like "illegal aliens"
         )
-        self.clf = LogisticRegression(max_iter=1000, C=1.0)
+        self.clf = LogisticRegression(max_iter=1000, C=10.0)
         self.is_trained = False
 
     def eval(self) -> "Model":
@@ -41,8 +41,10 @@ class Model(nn.Module):
     
     def fit(self, X_train, y_train):
         X_tfidf = self.vectorizer.fit_transform(X_train)
+        #compute loss and update model parameters 
         self.clf.fit(X_tfidf, y_train)
         self.is_trained = True
+        print("Model trained on {} examples.".format(len(X_train)))
     
     def predict(self, batch: Iterable[Any]) -> List[Any]:
         """
@@ -81,7 +83,7 @@ def get_model() -> Model:
 if __name__ == "__main__":
     X, y = prepare_data("url_with_headlines.csv")
 
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=123)
     model = Model()
     model.fit(X_train, y_train)
 
