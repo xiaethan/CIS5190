@@ -34,6 +34,8 @@ class Model(nn.Module):
         )
         self.clf = LogisticRegression(max_iter=1000, C=10.0)
         self.is_trained = False
+        if os.path.exists("model.pkl"): # if existing model is found, load it
+            self.load("model.pkl")
 
     def eval(self) -> "Model":
         # Optional: set your model to evaluation mode
