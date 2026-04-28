@@ -133,12 +133,18 @@ def scrape_headline(url: str) -> str:
         ]:
             tag = soup.find("meta", attrs={attr: value})
             if tag is not None and tag.get("content"):
-                return clean_text(tag["content"])
+                headline = clean_text(tag["content"])
+                if headline:
+                    print(headline)
+                return headline
 
         # Backup: find the first h1
         h1 = soup.find("h1")
         if h1 is not None:
-            return clean_text(h1.get_text(" ", strip=True))
+            headline = clean_text(h1.get_text(" ", strip=True))
+            if headline:
+                print(headline)
+            return headline
 
         return ""
 
