@@ -13,8 +13,8 @@ This project builds a classifier that predicts which news outlet produced a stor
 
 | File | Description |
 |------|-------------|
-| `preprocess_template_finished.py` | Implements `prepare_data(csv_path)` for the evaluator: reads a CSV with a `url` column and optional `headline` / `title` column, builds aligned inputs `X` (cleaned headline strings) and labels `y` (`FoxNews` or `NBC`). If no headline is present, fetches the page with HTTP and parses metadata/HTML (`requests` + BeautifulSoup); if that fails, falls back to text derived from the URL path. |
-| `model_template.py` | `Model` class (`nn.Module`) with `predict(batch)` and `get_model()`: TF–IDF features + scikit-learn `LogisticRegression`, trained weights in `model.pkl` when present. Running as `__main__` trains on a held-out split from `url_with_headlines.csv` and saves `model.pkl`. |
+| `preprocess.py` | Implements `prepare_data(csv_path)` for the evaluator: reads a CSV with a `url` column and optional `headline` / `title` column, builds aligned inputs `X` (cleaned headline strings) and labels `y` (`FoxNews` or `NBC`). If no headline is present, fetches the page with HTTP and parses metadata/HTML (`requests` + BeautifulSoup); if that fails, falls back to text derived from the URL path. |
+| `model.py` | `Model` class (`nn.Module`) with `predict(batch)` and `get_model()`: TF-IDF features + scikit-learn `LogisticRegression`, trained weights in `model.pkl` when present. Running as `__main__` trains on a held-out split from `url_with_headlines.csv` and saves `model.pkl`. |
 | `eval_project_b.py` | Imports the model and preprocessing modules, runs `prepare_data` on a validation CSV, runs batched inference, prints `num_examples`, `avg_infer_ms`, `total_infer_s`, and `accuracy`. Optional: `--weights` (PyTorch checkpoint), `--batch-size`. |
 
 ## Data
@@ -23,8 +23,8 @@ This project builds a classifier that predicts which news outlet produced a stor
 |------|-------------|
 | `url_with_headlines.csv` | One row per article: **`url`**, **`headline`**. Ground-truth outlet is implied by the domain (`foxnews.com` → FoxNews, `nbcnews.com` → NBC). Preprocessing uses the given headline text (cleaned) as model input. |
 | `url_only_data.csv` | **`url`** column only (same URLs as the headline dataset). Preprocessing has no headline column: it tries to **scrape** a title from each page, then falls back to a **slug-derived** string from the URL path if scraping fails or returns empty. |
-| `scraped_headlines.csv` | Optional artifact: **`headline`**, **`label`** pairs produced when running `preprocess_template_finished.py` as a script (writes cleaned `X`/`y` for inspection). Not required for training or `eval_project_b.py`. |
-| `model.pkl` | Serialized TF–IDF vectorizer + logistic regression weights produced by training in `model_template.py` (loaded automatically by `Model` / `get_model()` if the file exists). |
+| `scraped_headlines.csv` | Optional artifact: **`headline`**, **`label`** pairs produced when running `preprocess.py` as a script (writes cleaned `X`/`y` for inspection). Not required for training or `eval_project_b.py`. |
+| `model.pkl` | Serialized TF-IDF vectorizer + logistic regression weights produced by training in `model.py` (loaded automatically by `Model` / `get_model()` if the file exists). |
 
 ## Project workflow and usage
 
@@ -34,10 +34,10 @@ This project builds a classifier that predicts which news outlet produced a stor
    pip install -r requirements.txt
    ```
 
-2. **Train (optional)** — Fit the classifier and write `model.pkl` (uses `url_with_headlines.csv` and a train/test split inside `model_template.py`):
+2. **Train (optional)** — Fit the classifier and write `model.pkl` (uses `url_with_headlines.csv` and a train/test split inside `model.py`):
 
    ```bash
-   python3 model_template.py
+   python3 model.py
    ```
 
 3. **Evaluate** — Run the course evaluator on labeled data built by your preprocessor. Examples:
@@ -45,21 +45,19 @@ This project builds a classifier that predicts which news outlet produced a stor
    - Headlines provided in the CSV (fastest; no live HTTP):
 
      ```bash
-     python3 eval_project_b.py --model model_template.py --preprocess preprocess_template_finished.py --csv url_with_headlines.csv
+     python3 eval_project_b.py --model model.py --preprocess preprocess.py --csv url_with_headlines.csv
      ```
 
    - URL-only CSV (scraping + slug fallback; slower and depends on network / site HTML):
 
      ```bash
-     python3 eval_project_b.py --model model_template.py --preprocess preprocess_template_finished.py --csv url_only_data.csv
+     python3 eval_project_b.py --model model.py --preprocess preprocess.py --csv url_only_data.csv
      ```
-
-   Optional: `--batch-size N` (default 32), `--weights path.pt` if you switch to a PyTorch checkpoint-based model.
 
 4. **Inspect preprocessing output** — To regenerate `scraped_headlines.csv` from the preprocessor’s main block, run:
 
    ```bash
-   python3 preprocess_template_finished.py
+   python3 preprocess.py
    ```
 
 ## Project Results
