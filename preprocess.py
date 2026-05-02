@@ -157,7 +157,7 @@ def prepare_data(csv_path: str) -> Tuple[List[str], List[str]]:
     Required by the evaluator.
 
     Args:
-        csv_path: path to csv file, such as url_with_headlines.csv or url_only_data.csv
+        csv_path: path to csv file with URL + headline fields
 
     Returns:
         X: list of headline strings
@@ -173,8 +173,10 @@ def prepare_data(csv_path: str) -> Tuple[List[str], List[str]]:
     if url_col is None:
         raise ValueError("CSV must contain a URL column, such as 'url'.")
 
-    # 3. Find headline column if it exists
+    # 3. Headline column is required in the updated Project B data stream
     headline_col = find_column(df, ["headline", "title", "article_title"])
+    if headline_col is None:
+        raise ValueError("CSV must contain a headline/title column.")
 
     X = []
     y = []
@@ -184,19 +186,24 @@ def prepare_data(csv_path: str) -> Tuple[List[str], List[str]]:
 
         # Ground-truth label
         label = label_from_url(url)
-
+        
         # Case 1: use headline column if the CSV already has it
-        headline = ""
-        if headline_col is not None and not pd.isna(row[headline_col]):
-            headline = clean_text(row[headline_col])
+        #headline = ""
+        #if headline_col is not None and not pd.isna(row[headline_col]):
+        #    headline = clean_text(row[headline_col])
+        #    headline = clean_text(row[headline_col])
 
         # Case 2: if no headline is provided, try scraping
-        if headline == "":
-            headline = scrape_headline(url)
+        #if headline == "":
+        #    headline = scrape_headline(url)
 
         # Case 3: if scraping fails, use URL slug as backup
-        if headline == "":
-            headline = clean_text(headline_from_url_slug(url))
+        #if headline == "":
+        #    headline = clean_text(headline_from_url_slug(url))
+
+        # Single standardized pipeline for all models:
+        # use provided raw headline text (cleaned), no scraping/url-slug fallback.
+        headline = clean_text(row[headline_col]) if not pd.isna(row[headline_col]) else ""
 
         # Keep valid examples only
         if headline != "":

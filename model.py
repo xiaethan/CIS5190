@@ -1,5 +1,3 @@
-from py_compile import main
-
 import torch
 from torch import nn
 from typing import Any, Iterable, List
@@ -24,7 +22,7 @@ class Model(nn.Module):
     - If you use PyTorch, submit a state_dict to be loaded via `load_state_dict`
     """
 
-    def __init__(self, *args, **kwargs) -> None:
+    def __init__(self, auto_load: bool = True, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         # Initialize your model here
         self.vectorizer = TfidfVectorizer(
@@ -34,8 +32,12 @@ class Model(nn.Module):
         )
         self.clf = LogisticRegression(max_iter=1000, C=10.0)
         self.is_trained = False
-        if os.path.exists("model.pkl"): # if existing model is found, load it
-            self.load("model.pkl")
+        if auto_load and os.path.exists("model.pkl"):  # if existing model is found, load it
+            try:
+                self.load("model.pkl")
+            except Exception:
+                # If pickle was created with a different sklearn version, keep fresh model.
+                self.is_trained = False
 
     def eval(self) -> "Model":
         # Optional: set your model to evaluation mode
@@ -86,7 +88,8 @@ if __name__ == "__main__":
     X, y = prepare_data("url_with_headlines.csv")
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=123)
-    model = Model()
+    # Force fresh training run, even if an old incompatible pickle exists.
+    model = Model(auto_load=False)
     model.fit(X_train, y_train)
 
     preds = model.predict(X_test)
