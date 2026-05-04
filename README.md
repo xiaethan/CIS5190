@@ -1,4 +1,4 @@
-# CIS5190
+# Headline-Based News Source Classification
 
 **CIS5190 Final Project**
 
