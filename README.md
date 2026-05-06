@@ -2,10 +2,11 @@
 
 **CIS5190 Final Project**
 
-- **Project members:** Yixi Tan, Georges Chebly, Ethan Xia
-- **Project type:** News Source Classification
+- **Project Members:** Yixi Tan, Georges Chebly, Ethan Xia
+- **Project Type:** News Source Classification
 
-**Final project report:** [Overleaf](https://www.overleaf.com/8817778222wsgtvdjzmjhq#8f728f)
+**Final Project Report:** [Overleaf](https://www.overleaf.com/8817778222wsgtvdjzmjhq#8f728f)
+**Final Project Presentation:** [Google Drive](https://drive.google.com/file/d/1gfmNw0QCr2Dge4WoA0SSobCj8gPhgAHo/view?usp=sharing)
 
 This project builds a classifier that predicts which news outlet produced a story (**FoxNews** vs **NBC**) from headline text. Labels are derived from the article URL domain during preprocessing; the model only sees text features derived from headlines (either provided in the CSV or obtained by scraping or URL-slug fallback).
 
