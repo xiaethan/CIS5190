@@ -15,7 +15,7 @@ This project builds a classifier that predicts which news outlet produced a stor
 |------|-------------|
 | `preprocess.py` | Implements `prepare_data(csv_path)` for the evaluator: reads a CSV with a `url` column and optional `headline` / `title` column, builds aligned inputs `X` (cleaned headline strings) and labels `y` (`FoxNews` or `NBC`). If no headline is present, fetches the page with HTTP and parses metadata/HTML (`requests` + BeautifulSoup); if that fails, falls back to text derived from the URL path. |
 | `model.py` | `Model` class (`nn.Module`) with `predict(batch)` and `get_model()`: TF-IDF features + scikit-learn `LogisticRegression`, trained weights in `model.pkl` when present. Running as `__main__` trains on a held-out split from `url_with_headlines.csv` and saves `model.pkl`. |
-| `modelBERT.py` | `Model` + `get_model()`: RoBERTa (`roberta-base`) sequence classification. Auto-loads a PyTorch checkpoint if `model.pt` or `modelBERT.pt` exists next to the script (or in the current working directory). Running as `__main__` trains and saves `model.pt`. |
+| `modelBERT.py` | `Model` + `get_model()`: RoBERTa (`roberta-base`) sequence classification. Auto-loads a PyTorch checkpoint if `model.pt` or `modelBERT.pt` exists next to the script (or in the current working directory). Running as `__main__` trains and saves `modelBERT.pt`. |
 | `modelNN.py` | `Model` + `get_model()`: TF-IDF (up to 30k features, bigrams) + a small MLP head. Auto-loads `model.pt` or `modelNN.pt` next to the script or in the CWD. Running as `__main__` trains and saves `model.pt`. |
 | `eval_project_b.py` | Imports the model and preprocessing modules, runs `prepare_data` on a validation CSV, runs batched inference, prints `num_examples`, `avg_infer_ms`, `total_infer_s`, and `accuracy`. Optional: `--weights` (PyTorch checkpoint), `--batch-size`. |
 
@@ -29,7 +29,7 @@ This project builds a classifier that predicts which news outlet produced a stor
 | `model.pkl` | Pickle artifact for `model.py`: TF-IDF vectorizer + `LogisticRegression` (loaded automatically when present). |
 | `modelBERT.pt` | PyTorch checkpoint for `modelBERT.py` (Hugging Face classifier state + metadata). The class also accepts a generic `model.pt` in the same search order if you prefer a single filename. |
 | `modelNN.pt` | PyTorch checkpoint for `modelNN.py` (vectorizer + MLP `state_dict`). The class also checks for `model.pt` first in the same directories. |
-| `model.pt` | Generic PyTorch weights name used by `modelBERT.py` / `modelNN.py` when you train from their `__main__` blocks (saved in the project root). Use distinct files (`modelBERT.pt`, `modelNN.pt`) when both neural checkpoints live in the repo so loaders do not pick up the wrong architecture. |
+| `model.pt` | Generic PyTorch weights name still checked by `modelBERT.py` / `modelNN.py` for auto-load; `modelNN.py`’s `__main__` saves here. Use distinct files (`modelBERT.pt`, `modelNN.pt`) when both neural checkpoints live in the repo so loaders do not pick up the wrong architecture. |
 
 **Note:** `*.pt` and `*.pkl` are listed in `.gitignore`; add trained artifacts locally or distribute them outside git as needed for submission.
 
@@ -45,7 +45,7 @@ This project builds a classifier that predicts which news outlet produced a stor
 
    ```bash
    python3 model.py          # -> model.pkl (TF-IDF + logistic regression)
-   python3 modelBERT.py      # -> model.pt (RoBERTa; rename/copy to modelBERT.pt if you keep multiple .pt files)
+   python3 modelBERT.py      # -> modelBERT.pt (RoBERTa)
    python3 modelNN.py        # -> model.pt (TF-IDF + MLP; rename/copy to modelNN.pt to avoid clashing with BERT)
    ```
 

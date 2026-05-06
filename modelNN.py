@@ -153,4 +153,4 @@ if __name__ == "__main__":
     print("Accuracy:", accuracy_score(y_test, preds))
 
     # Save with canonical leaderboard filename.
-    model.save(str(Path(__file__).resolve().parent / "model.pt"))
+    model.save(str(Path(__file__).resolve().parent / "modelNN.pt"))

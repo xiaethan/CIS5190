@@ -32,7 +32,7 @@ class Model(nn.Module):
 
     def __init__(self, auto_load: bool = True, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
-        self.base_model_name = "roberta-base"
+        self.base_model_name = "bert-base-uncased"
         self.label_to_id = {"FoxNews": 0, "NBC": 1}
         self.id_to_label = {0: "FoxNews", 1: "NBC"}
         self.max_length = 128
@@ -233,4 +233,4 @@ if __name__ == "__main__":
     preds = model.predict(X_test)
     print("Accuracy:", accuracy_score(y_test, preds))
 
-    model.save(str(Path(__file__).resolve().parent / "model.pt"))
+    model.save(str(Path(__file__).resolve().parent / "modelBERT.pt"))
