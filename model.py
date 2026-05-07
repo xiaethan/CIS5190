@@ -8,7 +8,7 @@ import os
 from preprocess import prepare_data
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
-
+import numpy as np
 
 class Model(nn.Module):
     """
@@ -96,3 +96,24 @@ if __name__ == "__main__":
     print("Accuracy:", accuracy_score(y_test, preds))
 
     model.save("model.pkl")
+
+    X_test = list(X_test)
+    for headline, true, pred in zip(X_test, y_test, preds):
+        if true != pred:
+            print(f"Headline: {headline}")
+            print(f"True: {true} | Predicted: {pred}")
+            print()
+
+    feature_names = model.vectorizer.get_feature_names_out()
+    coefs = model.clf.coef_[0]
+
+    top_fox = np.argsort(coefs)[-20:]
+    top_nbc = np.argsort(coefs)[:20]
+
+    print("TOP FOX WORDS:")
+    for i in top_fox:
+        print(f"  {feature_names[i]}: {coefs[i]:.3f}")
+
+    print("\nTOP NBC WORDS:")
+    for i in top_nbc:
+        print(f"  {feature_names[i]}: {coefs[i]:.3f}")

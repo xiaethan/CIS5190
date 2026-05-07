@@ -234,3 +234,10 @@ if __name__ == "__main__":
     print("Accuracy:", accuracy_score(y_test, preds))
 
     model.save(str(Path(__file__).resolve().parent / "modelBERT.pt"))
+
+    X_test = list(X_test)
+    for headline, true, pred in zip(X_test, y_test, preds):
+        if true != pred:
+            print(f"Headline: {headline}")
+            print(f"True: {true} | Predicted: {pred}")
+            print()
